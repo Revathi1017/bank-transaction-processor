@@ -15,4 +15,10 @@ public class GlobalExceptionHandler {
     public Map<String, String> handleAccountNotFound(AccountNotFoundException ex) {
         return Map.of("error", ex.getMessage());
     }
+
+    @ExceptionHandler(InsufficientFundsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleInsufficientFunds(InsufficientFundsException ex) {
+        return Map.of("error", ex.getMessage());
+    }
 }

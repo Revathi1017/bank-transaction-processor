@@ -29,7 +29,11 @@ public class AccountController {
 
     @PostMapping("/{accountId}/deposit")
     public AccountResponse deposit(@PathVariable String accountId, @Valid @RequestBody MoneyRequest request) {
-
         return accountService.deposit(accountId, request);
+    }
+
+    @PostMapping("/{accountId}/withdraw")
+    public AccountResponse withdraw(@PathVariable String accountId, @Valid @RequestBody MoneyRequest request) {
+        return accountService.withdraw(accountId, request);
     }
 }

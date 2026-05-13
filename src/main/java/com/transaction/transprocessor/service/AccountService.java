@@ -13,4 +13,6 @@ public interface AccountService {
     AccountResponse getAccountById(String accountId);
 
     AccountResponse deposit(String accountId, MoneyRequest request);
+
+    AccountResponse withdraw(String accontId, MoneyRequest request);
 }
