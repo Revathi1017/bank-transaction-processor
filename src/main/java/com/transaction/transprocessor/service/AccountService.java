@@ -9,4 +9,5 @@ public interface AccountService {
 
     AccountResponse createAccount(CreateAccountRequest request);
 
+    AccountResponse getAccountById(String accountId);
 }
