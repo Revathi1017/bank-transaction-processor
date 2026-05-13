@@ -17,7 +17,27 @@ public class Account {
 
     private LocalDateTime createdAt;
 
+    public UUID getAccountID() {
+        return accountID;
+    }
 
+    public void setAccountID(UUID accountID) {
+        this.accountID = accountID;
+    }
 
+    public BigDecimal getBalance() {
+        return balance;
+    }
 
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }
