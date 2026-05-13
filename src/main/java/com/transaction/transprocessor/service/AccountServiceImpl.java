@@ -2,6 +2,7 @@ package com.transaction.transprocessor.service;
 
 import com.transaction.transprocessor.dto.AccountResponse;
 import com.transaction.transprocessor.dto.CreateAccountRequest;
+import com.transaction.transprocessor.dto.MoneyRequest;
 import com.transaction.transprocessor.entity.Account;
 import com.transaction.transprocessor.exception.AccountNotFoundException;
 import com.transaction.transprocessor.repository.AccountRepository;
@@ -36,6 +37,7 @@ public class AccountServiceImpl implements AccountService{
         return response;
     }
 
+    @Override
     public AccountResponse getAccountById(String accountId) {
         Account account = accountRepository.findById(UUID.fromString(accountId))
                 .orElseThrow(() -> new AccountNotFoundException("Account not found"));
@@ -44,6 +46,22 @@ public class AccountServiceImpl implements AccountService{
         AccountResponse response = new AccountResponse();
         response.setAccountId(account.getAccountID());
         response.setBalance(account.getBalance());
+
+        return response;
+    }
+
+    @Override
+    public AccountResponse deposit(String accountId, MoneyRequest request) {
+        Account account = accountRepository.findById(UUID.fromString(accountId))
+                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+
+        account.setBalance(account.getBalance().add(request.getAmount()));
+
+        Account updatedAccount = accountRepository.save(account);
+
+        AccountResponse response = new AccountResponse();
+        response.setAccountId(updatedAccount.getAccountID());
+        response.setBalance(updatedAccount.getBalance());
 
         return response;
     }
