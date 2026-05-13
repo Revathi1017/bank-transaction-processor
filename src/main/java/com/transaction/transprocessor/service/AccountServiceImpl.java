@@ -3,10 +3,13 @@ package com.transaction.transprocessor.service;
 import com.transaction.transprocessor.dto.AccountResponse;
 import com.transaction.transprocessor.dto.CreateAccountRequest;
 import com.transaction.transprocessor.dto.MoneyRequest;
+import com.transaction.transprocessor.dto.TransferRequest;
 import com.transaction.transprocessor.entity.Account;
 import com.transaction.transprocessor.exception.AccountNotFoundException;
 import com.transaction.transprocessor.exception.InsufficientFundsException;
+import com.transaction.transprocessor.exception.InvalidTransferException;
 import com.transaction.transprocessor.repository.AccountRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -84,6 +87,37 @@ public class AccountServiceImpl implements AccountService{
         AccountResponse response = new AccountResponse();
         response.setAccountId(updatedAccount.getAccountID());
         response.setBalance(updatedAccount.getBalance());
+
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public AccountResponse transfer(TransferRequest request) {
+        if(request.getFromAccountId().equals(request.getToAccountId())) {
+            throw  new InvalidTransferException("Cannot transfer to same account");
+        }
+
+        Account sender = accountRepository.findById(UUID.fromString(request.getFromAccountId()))
+                .orElseThrow(() -> new AccountNotFoundException("Sender account not found"));
+
+        Account receiver = accountRepository.findById(UUID.fromString(request.getToAccountId()))
+                .orElseThrow(() -> new AccountNotFoundException("Receiver account not found"));
+
+        if (sender.getBalance().compareTo(request.getAmount()) < 0) {
+            throw new InsufficientFundsException("Insufficient balance");
+        }
+
+        sender.setBalance(sender.getBalance().subtract(request.getAmount()));
+
+        receiver.setBalance(receiver.getBalance().add(request.getAmount()));
+
+        accountRepository.save(sender);
+        accountRepository.save(receiver);
+
+        AccountResponse response = new AccountResponse();
+        response.setAccountId(sender.getAccountID());
+        response.setBalance(sender.getBalance());
 
         return response;
     }

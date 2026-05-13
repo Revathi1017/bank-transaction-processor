@@ -21,4 +21,10 @@ public class GlobalExceptionHandler {
     public Map<String, String> handleInsufficientFunds(InsufficientFundsException ex) {
         return Map.of("error", ex.getMessage());
     }
+
+    @ExceptionHandler(InvalidTransferException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleInvalidTransfer(InvalidTransferException ex) {
+        return Map.of("error", ex.getMessage());
+    }
 }

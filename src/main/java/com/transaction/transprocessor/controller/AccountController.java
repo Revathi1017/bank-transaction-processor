@@ -3,6 +3,7 @@ package com.transaction.transprocessor.controller;
 import com.transaction.transprocessor.dto.AccountResponse;
 import com.transaction.transprocessor.dto.CreateAccountRequest;
 import com.transaction.transprocessor.dto.MoneyRequest;
+import com.transaction.transprocessor.dto.TransferRequest;
 import com.transaction.transprocessor.service.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -35,5 +36,10 @@ public class AccountController {
     @PostMapping("/{accountId}/withdraw")
     public AccountResponse withdraw(@PathVariable String accountId, @Valid @RequestBody MoneyRequest request) {
         return accountService.withdraw(accountId, request);
+    }
+
+    @PostMapping("/transfer")
+    public AccountResponse transfer(@Valid @RequestBody TransferRequest request) {
+        return accountService.transfer(request);
     }
 }
