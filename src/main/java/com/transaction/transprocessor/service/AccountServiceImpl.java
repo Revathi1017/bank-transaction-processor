@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Formatter;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -154,7 +154,6 @@ public class AccountServiceImpl implements AccountService{
         return response;
     }
 
-
     private void recordTransaction(
             UUID accountId,
             TransactionType type,
@@ -174,4 +173,25 @@ public class AccountServiceImpl implements AccountService{
 
     }
 
+    @Override
+    public List<TransactionResponse> getTransactions(String accountId) {
+
+        List<Transaction> transactions = transactionRepository.findByAccountId(UUID.fromString(accountId));
+
+        return transactions.stream().map(transaction -> {
+
+            TransactionResponse response = new TransactionResponse();
+
+            response.setTransactionId(transaction.getTransactionId());
+                    response.setType(transaction.getType());
+                    response.setAmount(transaction.getAmount());
+                    response.setBalanceAfterTransaction(
+                            transaction.getBalanceAfterTransaction()
+                    );
+                    response.setTimestamp(transaction.getTimestamp());
+
+                    return response;
+                })
+                .toList();
+    }
 }

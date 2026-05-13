@@ -1,12 +1,11 @@
 package com.transaction.transprocessor.controller;
 
-import com.transaction.transprocessor.dto.AccountResponse;
-import com.transaction.transprocessor.dto.CreateAccountRequest;
-import com.transaction.transprocessor.dto.MoneyRequest;
-import com.transaction.transprocessor.dto.TransferRequest;
+import com.transaction.transprocessor.dto.*;
 import com.transaction.transprocessor.service.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/accounts")
@@ -41,5 +40,10 @@ public class AccountController {
     @PostMapping("/transfer")
     public AccountResponse transfer(@Valid @RequestBody TransferRequest request) {
         return accountService.transfer(request);
+    }
+
+    @GetMapping("/{accountId}/transactions")
+    public List<TransactionResponse> getTransactions(@PathVariable String accountId) {
+        return accountService.getTransactions(accountId);
     }
 }

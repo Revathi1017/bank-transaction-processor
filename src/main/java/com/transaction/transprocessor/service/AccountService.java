@@ -1,10 +1,8 @@
 package com.transaction.transprocessor.service;
 
-import com.transaction.transprocessor.dto.AccountResponse;
-import com.transaction.transprocessor.dto.CreateAccountRequest;
-import com.transaction.transprocessor.dto.MoneyRequest;
-import com.transaction.transprocessor.dto.TransferRequest;
+import com.transaction.transprocessor.dto.*;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface AccountService {
@@ -19,6 +17,5 @@ public interface AccountService {
 
     AccountResponse transfer(TransferRequest request);
 
-    //List<TransactionResponse> getTransactions(UUID accountId);
-
+    List<TransactionResponse> getTransactions(String accountId);
 }
