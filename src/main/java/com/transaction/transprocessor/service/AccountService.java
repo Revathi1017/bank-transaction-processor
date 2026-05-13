@@ -18,4 +18,7 @@ public interface AccountService {
     AccountResponse withdraw(String accontId, MoneyRequest request);
 
     AccountResponse transfer(TransferRequest request);
+
+    //List<TransactionResponse> getTransactions(UUID accountId);
+
 }

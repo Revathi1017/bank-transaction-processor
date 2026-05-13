@@ -1,18 +1,19 @@
 package com.transaction.transprocessor.service;
 
-import com.transaction.transprocessor.dto.AccountResponse;
-import com.transaction.transprocessor.dto.CreateAccountRequest;
-import com.transaction.transprocessor.dto.MoneyRequest;
-import com.transaction.transprocessor.dto.TransferRequest;
+import com.transaction.transprocessor.dto.*;
 import com.transaction.transprocessor.entity.Account;
+import com.transaction.transprocessor.entity.Transaction;
 import com.transaction.transprocessor.exception.AccountNotFoundException;
 import com.transaction.transprocessor.exception.InsufficientFundsException;
 import com.transaction.transprocessor.exception.InvalidTransferException;
 import com.transaction.transprocessor.repository.AccountRepository;
+import com.transaction.transprocessor.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Formatter;
 import java.util.UUID;
 
 @Service
@@ -20,8 +21,11 @@ public class AccountServiceImpl implements AccountService{
 
     private final AccountRepository accountRepository;
 
-    public AccountServiceImpl(AccountRepository accountRepository) {
+    private final TransactionRepository transactionRepository;
+
+    public AccountServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository) {
         this.accountRepository = accountRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     @Override
@@ -63,6 +67,13 @@ public class AccountServiceImpl implements AccountService{
 
         Account updatedAccount = accountRepository.save(account);
 
+        recordTransaction(
+                updatedAccount.getAccountID(),
+                TransactionType.DEPOSIT,
+                request.getAmount(),
+                updatedAccount.getBalance()
+        );
+
         AccountResponse response = new AccountResponse();
         response.setAccountId(updatedAccount.getAccountID());
         response.setBalance(updatedAccount.getBalance());
@@ -83,6 +94,13 @@ public class AccountServiceImpl implements AccountService{
         account.setBalance(account.getBalance().subtract(request.getAmount()));
 
         Account updatedAccount = accountRepository.save(account);
+
+        recordTransaction(
+                updatedAccount.getAccountID(),
+                TransactionType.WITHDRAWAL,
+                request.getAmount(),
+                updatedAccount.getBalance()
+        );
 
         AccountResponse response = new AccountResponse();
         response.setAccountId(updatedAccount.getAccountID());
@@ -115,10 +133,45 @@ public class AccountServiceImpl implements AccountService{
         accountRepository.save(sender);
         accountRepository.save(receiver);
 
+        recordTransaction(
+                sender.getAccountID(),
+                TransactionType.TRANSFER_OUT,
+                request.getAmount(),
+                sender.getBalance()
+        );
+
+        recordTransaction(
+                receiver.getAccountID(),
+                TransactionType.TRANSFER_IN,
+                request.getAmount(),
+                receiver.getBalance()
+        );
+
         AccountResponse response = new AccountResponse();
         response.setAccountId(sender.getAccountID());
         response.setBalance(sender.getBalance());
 
         return response;
     }
+
+
+    private void recordTransaction(
+            UUID accountId,
+            TransactionType type,
+            BigDecimal amount,
+            BigDecimal balanceAfterTransaction) {
+
+        Transaction transaction = new Transaction();
+
+        transaction.setTransactionId(UUID.randomUUID());
+        transaction.setAccountId(accountId);
+        transaction.setType(type);
+        transaction.setAmount(amount);
+        transaction.setBalanceAfterTransaction(balanceAfterTransaction);
+        transaction.setTimestamp(LocalDateTime.now());
+
+        transactionRepository.save(transaction);
+
+    }
+
 }
